@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Panel - QR Dinámico</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&JetBrains+Mono:wght@400;600&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <div class="logo-icon">📱</div>
+                    QR Dinámico
+                </a>
+                <div class="user-info">
+                    <img id="userAvatar" src="" alt="User" class="user-avatar">
+                    <span id="userName" class="user-name"></span>
+                    <a href="/auth/logout" class="btn btn-secondary">Cerrar sesión</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="margin-top: var(--spacing-lg); margin-bottom: var(--spacing-xl);">
+        <!-- Create New QR Section -->
+        <section class="glass-card" style="max-width: 600px; margin: 0 auto var(--spacing-xl);">
+            <h2 class="text-center mb-2"
+                style="background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                ✨ Crear Nuevo QR
+            </h2>
+
+            <form id="createQrForm">
+                <div class="form-group">
+                    <label for="newTitle" class="form-label"
+                        style="text-transform: uppercase; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; color: var(--text-secondary); margin-bottom: 8px;">Título
+                        del QR (opcional)</label>
+                    <input type="text" id="newTitle" name="title" class="form-input" placeholder="Ej: Mi Portafolio"
+                        style="margin-bottom: var(--spacing-md);">
+                </div>
+
+                <div class="form-group">
+                    <label for="newUrl" class="form-label"
+                        style="text-transform: uppercase; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; color: var(--text-secondary); margin-bottom: 8px;">URL
+                        de Destino</label>
+                    <input type="url" id="newUrl" name="url" class="form-input" placeholder="https://ejemplo.com"
+                        required>
+                </div>
+
+                <div class="form-group" style="margin-top: 1rem;">
+                    <label for="newAlias" class="form-label"
+                        style="text-transform: uppercase; font-size: 0.75rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 8px;">Alias
+                        personalizado (opcional)</label>
+                    <div style="display: flex; align-items: stretch; gap: 0;">
+                        <div
+                            style="background: var(--bg-tertiary); border: 1px solid var(--border-color); border-right: none; padding: 0 10px; display: flex; align-items: center; color: var(--text-muted); font-size: 0.85rem; border-radius: 4px 0 0 4px; font-family: var(--font-mono);">
+                            /qr/
+                        </div>
+                        <input type="text" id="newAlias" name="alias" class="form-input" placeholder="mi-slug"
+                            style="border-radius: 0 4px 4px 0; flex: 1;" pattern="^[a-zA-Z0-9-_]+$"
+                            title="Solo letras, números, guiones y guiones bajos">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+                    <span>🎯 Crear QR</span>
+                </button>
+            </form>
+        </section>
+
+        <!-- QR Codes List -->
+        <section>
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-lg);">
+                <h2 style="font-size: 2rem;">Mis QR Codes</h2>
+                <span id="qrCount" style="color: var(--text-secondary);">Cargando...</span>
+            </div>
+
+            <div id="qrGrid" class="qr-grid">
+                <!-- QR codes will be loaded here -->
+            </div>
+
+            <div id="emptyState" class="text-center hidden"
+                style="padding: var(--spacing-xl); color: var(--text-muted);">
+                <div style="font-size: 4rem; margin-bottom: var(--spacing-md);">📱</div>
+                <h3 style="margin-bottom: var(--spacing-sm);">No tienes QR codes todavía</h3>
+                <p>Crea tu primer código QR dinámico usando el formulario de arriba.</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">✏️ Editar QR Code</h3>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+
+            <form id="editQrForm">
+                <input type="hidden" id="editQrId">
+
+                <div class="form-group">
+                    <label for="editTitle" class="form-label">Título</label>
+                    <input type="text" id="editTitle" class="form-input" placeholder="Mi QR">
+                </div>
+
+                <div class="form-group">
+                    <label for="editUrl" class="form-label">Nueva URL</label>
+                    <input type="url" id="editUrl" name="url" class="form-input" placeholder="https://ejemplo.com"
+                        required>
+                </div>
+
+                <div class="form-group">
+                    <label for="editAlias" class="form-label">Alias de URL Corta</label>
+                    <div style="display: flex; align-items: stretch; gap: 0;">
+                        <div
+                            style="background: var(--bg-tertiary); border: 1px solid var(--border-color); border-right: none; padding: 0 10px; display: flex; align-items: center; color: var(--text-muted); font-size: 0.85rem; border-radius: 4px 0 0 4px; font-family: var(--font-mono);">
+                            /qr/
+                        </div>
+                        <input type="text" id="editAlias" class="form-input" placeholder="nuevo-alias"
+                            style="border-radius: 0 4px 4px 0; flex: 1;" pattern="^[a-zA-Z0-9-_]+$"
+                            title="Solo letras, números, guiones y guiones bajos">
+                    </div>
+                    <p style="font-size: 0.7rem; color: #ffab00; margin-top: 4px;">⚠️ Cambiar el alias invalidará los QR
+                        impresos.</p>
+                </div>
+
+                <div style="display: flex; gap: var(--spacing-sm); margin-top: var(--spacing-lg);">
+                    <button type="button" class="btn btn-secondary" id="cancelEdit" style="flex: 1;">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">
+                        💾 Guardar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">⚠️ Confirmar Eliminación</h3>
+                <button class="modal-close" id="closeDeleteModal">&times;</button>
+            </div>
+
+            <p style="margin-bottom: var(--spacing-lg); color: var(--text-secondary);">
+                ¿Estás seguro de que quieres eliminar este QR code? Esta acción no se puede deshacer.
+            </p>
+
+            <div style="display: flex; gap: var(--spacing-sm);">
+                <button class="btn btn-secondary" id="cancelDelete" style="flex: 1;">
+                    Cancelar
+                </button>
+                <button class="btn btn-danger" id="confirmDelete" style="flex: 1;">
+                    🗑️ Eliminar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/dashboard.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración - QR Dinámico</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <div class="logo-icon">🔐</div>
+                    Panel de Administración
+                </a>
+                <div class="user-info">
+                    <img id="userAvatar" src="" alt="User" class="user-avatar">
+                    <span id="userName" class="user-name"></span>
+                    <a href="/auth/logout" class="btn btn-secondary" style="margin-left: var(--spacing-md);">
+                        Cerrar sesión
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="margin-top: var(--spacing-lg); margin-bottom: var(--spacing-xl);">
+
+        <!-- Stats Section -->
+        <section class="glass-card" style="margin-bottom: var(--spacing-lg);">
+            <h2
+                style="margin-bottom: var(--spacing-md); background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                📊 Estadísticas
+            </h2>
+            <div class="qr-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                <div
+                    style="text-align: center; padding: var(--spacing-md); background: var(--bg-secondary); border-radius: var(--radius-md);">
+                    <div style="font-size: 2.5rem; margin-bottom: var(--spacing-xs);" id="totalQrs">0</div>
+                    <div style="color: var(--text-secondary); font-size: 0.875rem;">Total QR Codes</div>
+                </div>
+                <div
+                    style="text-align: center; padding: var(--spacing-md); background: var(--bg-secondary); border-radius: var(--radius-md);">
+                    <div style="font-size: 2.5rem; margin-bottom: var(--spacing-xs);" id="anonymousQrs">0</div>
+                    <div style="color: var(--text-secondary); font-size: 0.875rem;">QRs Anónimos</div>
+                </div>
+                <div
+                    style="text-align: center; padding: var(--spacing-md); background: var(--bg-secondary); border-radius: var(--radius-md);">
+                    <div style="font-size: 2.5rem; margin-bottom: var(--spacing-xs);" id="usersQrs">0</div>
+                    <div style="color: var(--text-secondary); font-size: 0.875rem;">QRs con Usuario</div>
+                </div>
+                <div
+                    style="text-align: center; padding: var(--spacing-md); background: var(--bg-secondary); border-radius: var(--radius-md);">
+                    <div style="font-size: 2.5rem; margin-bottom: var(--spacing-xs); color: var(--accent-color);"
+                        id="totalClicks">0</div>
+                    <div style="color: var(--text-secondary); font-size: 0.875rem;">Total Clicks</div>
+                </div>
+                <div
+                    style="text-align: center; padding: var(--spacing-md); background: var(--bg-secondary); border-radius: var(--radius-md);">
+                    <div style="font-size: 2.5rem; margin-bottom: var(--spacing-xs); color: var(--accent-color);"
+                        id="todayClicks">0</div>
+                    <div style="color: var(--text-secondary); font-size: 0.875rem;">Clicks Hoy</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- QR Codes Section -->
+        <section class="glass-card">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-md);">
+                <h2
+                    style="margin: 0; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                    Todos los QR Codes
+                </h2>
+                <div id="qrCount" style="color: var(--text-secondary);"></div>
+            </div>
+
+            <div id="qrGrid" class="qr-grid">
+                <!-- QR codes will be loaded here -->
+            </div>
+
+            <div id="emptyState" class="hidden text-center" style="padding: var(--spacing-xl);">
+                <div style="font-size: 4rem; margin-bottom: var(--spacing-md);">📱</div>
+                <h3 style="margin-bottom: var(--spacing-sm);">No hay QR codes todavía</h3>
+                <p style="color: var(--text-secondary);">Los QR codes aparecerán aquí cuando se creen.</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">✏️ Editar QR Code</h3>
+                <button class="modal-close" id="closeModal">×</button>
+            </div>
+            <form id="editQrForm">
+                <input type="hidden" id="editQrId">
+
+                <div class="form-group">
+                    <label for="editTitle" class="form-label">Título</label>
+                    <input type="text" id="editTitle" class="form-input" placeholder="Mi QR">
+                </div>
+
+                <div class="form-group">
+                    <label for="editUrl" class="form-label">URL de Destino</label>
+                    <input type="url" id="editUrl" name="url" class="form-input" placeholder="https://ejemplo.com"
+                        required>
+                </div>
+
+                <div class="form-group"
+                    style="padding-top: var(--spacing-md); margin-top: var(--spacing-md); border-top: 1px solid var(--border-color);">
+                    <label for="editUserEmail" class="form-label">Usuario Dueño (Email)</label>
+                    <input type="email" id="editUserEmail" class="form-input" placeholder="usuario@gmail.com">
+                    <small style="color: var(--text-secondary); display: block; margin-top: 5px;">
+                        Deja vacío para mantener. Escribe "anonimo" para quitar dueño.
+                    </small>
+                </div>
+
+                <div style="display: flex; gap: var(--spacing-sm); margin-top: var(--spacing-lg);">
+                    <button type="button" class="btn btn-secondary" id="cancelEdit" style="flex: 1;">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">
+                        💾 Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">🗑️ Eliminar QR Code</h3>
+                <button class="modal-close" id="closeDeleteModal">×</button>
+            </div>
+            <p style="color: var(--text-secondary); margin-bottom: var(--spacing-lg);">
+                ¿Estás seguro de que quieres eliminar este QR code? Esta acción no se puede deshacer.
+            </p>
+            <div style="display: flex; gap: var(--spacing-sm);">
+                <button id="confirmDelete" class="btn btn-danger" style="flex: 1;">
+                    Sí, eliminar
+                </button>
+                <button id="cancelDelete" class="btn btn-secondary" style="flex: 1;">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/admin.js"></script>
+</body>
+
+</html>

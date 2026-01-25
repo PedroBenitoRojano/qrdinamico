@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar QR - QR Dinámico</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <a href="/" class="logo">
+                    <div class="logo-icon">📱</div>
+                    QR Dinámico
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="margin-top: var(--spacing-lg); margin-bottom: var(--spacing-xl);">
+        <!-- Edit QR Section -->
+        <section class="glass-card" style="max-width: 700px; margin: 0 auto;">
+            <h2 class="text-center mb-2"
+                style="background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+                ✏️ Editar QR Anónimo
+            </h2>
+
+            <div id="loadingState" class="text-center" style="padding: var(--spacing-xl);">
+                <div class="loading" style="width: 40px; height: 40px; margin: 0 auto;"></div>
+                <p style="margin-top: var(--spacing-md); color: var(--text-secondary);">Cargando QR code...</p>
+            </div>
+
+            <div id="editContent" class="hidden">
+                <div class="qr-card-image" style="margin-bottom: var(--spacing-lg);">
+                    <img id="qrImage" src="" alt="QR Code">
+                </div>
+
+                <div style="margin-bottom: var(--spacing-lg);">
+                    <div style="color: var(--text-secondary); margin-bottom: var(--spacing-xs);">
+                        <strong>🔗 URL corta:</strong>
+                    </div>
+                    <div style="font-family: var(--font-mono); color: var(--accent-color);" id="shortUrl"></div>
+                </div>
+
+                <form id="editQrForm">
+                    <div class="form-group">
+                        <label for="newUrl" class="form-label">Nueva URL de Destino</label>
+                        <input type="url" id="newUrl" name="url" class="form-input" placeholder="https://ejemplo.com"
+                            required>
+                    </div>
+
+                    <div style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: var(--spacing-md);">
+                        <strong>⚠️ Nota:</strong> Este es un QR anónimo. Cualquiera con este enlace puede editarlo.
+                        Para mayor seguridad, <a href="/auth/google" style="color: var(--accent-color);">inicia sesión
+                            con Google</a>.
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <span>💾 Guardar Cambios</span>
+                    </button>
+                </form>
+            </div>
+
+            <div id="errorState" class="hidden text-center" style="padding: var(--spacing-xl);">
+                <div style="font-size: 4rem; margin-bottom: var(--spacing-md);">⚠️</div>
+                <h3 style="margin-bottom: var(--spacing-sm);">QR code no encontrado</h3>
+                <p style="color: var(--text-secondary); margin-bottom: var(--spacing-lg);">
+                    El QR que intentas editar no existe o ha sido eliminado.
+                </p>
+                <a href="/" class="btn btn-primary">Volver al inicio</a>
+            </div>
+        </section>
+    </main>
+
+    <script src="/js/edit.js"></script>
+</body>
+
+</html>
