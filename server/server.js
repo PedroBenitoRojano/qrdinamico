@@ -45,6 +45,9 @@ const PORT = process.env.PORT || 3000;
     // Static files
     app.use(express.static(path.join(__dirname, '../public')));
 
+    // Health check
+    app.get('/health', (req, res) => res.status(200).send('OK'));
+
     // Routes
     app.use('/auth', authRoutes);
     app.use('/api/qr', qrRoutes);

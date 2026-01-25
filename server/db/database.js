@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 let db;
-const dbPath = path.join(__dirname, '../../qrdinamico.db');
+const dbPath = process.env.DATABASE_PATH || path.join(__dirname, '../../qrdinamico.db');
 
 // Initialize database
 async function initDatabase() {

@@ -207,6 +207,23 @@ NODE_ENV=production
 - Considera usar PM2 para gestionar el proceso Node.js
 - Haz backups regulares de la base de datos SQLite (`qrdinamico.db`)
 
+### Despliegue en Railway
+
+Railway es la opción más sencilla para desplegar esta aplicación:
+
+1.  **Conectar GitHub**: Crea un nuevo proyecto en Railway y selecciona tu repositorio `qrdinamico`.
+2.  **Configurar Variables**: En la pestaña "Variables", añade:
+    *   `NODE_ENV`: `production`
+    *   `BASE_URL`: Tu URL de Railway (ej: `https://...up.railway.app`)
+    *   `SESSION_SECRET`: Una cadena aleatoria larga.
+    *   `DATABASE_PATH`: `/data/qrdinamico.db` (Importante para persistencia).
+3.  **Montar Volumen**:
+    *   Ve a la pestaña **Settings** de tu servicio en Railway.
+    *   Busca la sección **Volumes** y haz clic en "Add Volume".
+    *   Configura el Mount Path como `/data`.
+    *   Esto asegurará que tu base de datos SQLite no se borre al reiniciar el servidor.
+4.  **Health Check**: Railway detectará automáticamente el endpoint `/health` que hemos configurado para verificar que la app está lista.
+
 ## 🤝 Contribuir
 
 Las contribuciones son bienvenidas. Por favor:
