@@ -43,7 +43,7 @@ async function init() {
         }
 
         qrData = await response.json();
-        displayQrData();
+        await displayQrData();
         await loadAnalytics();
 
         loadingState.classList.add('hidden');
@@ -56,7 +56,7 @@ async function init() {
 }
 
 // Modificar displayQrData para formato 2 líneas
-function displayQrData() {
+async function displayQrData() {
     qrImage.src = `/api/qr/${shortId}/image`;
     qrTitle.textContent = qrData.title || `QR ${shortId}`;
     shortUrlInput.value = qrData.shortUrl;
@@ -65,6 +65,65 @@ function displayQrData() {
     openDestination.href = qrData.shortUrl;
     totalVisits.textContent = qrData.visitsCount || 0;
     createdAt.innerHTML = formatDate(qrData.createdAt).replace(', ', '<br>');
+
+    // Handle Claim Banner
+    const claimBanner = document.getElementById('claimBanner');
+    const claimActions = document.getElementById('claimActions');
+
+    if (qrData.userId === null) {
+        claimBanner.classList.remove('hidden');
+
+        // Check if user is logged in
+        try {
+            const authResponse = await fetch('/auth/user');
+            if (authResponse.ok) {
+                const user = await authResponse.json();
+                claimActions.innerHTML = `
+                    <button id="claimBtn" class="btn btn-primary" style="font-size: 0.85rem;">
+                        ✨ Guardar en mi cuenta
+                    </button>
+                `;
+                document.getElementById('claimBtn').addEventListener('click', claimQr);
+            } else {
+                claimActions.innerHTML = `
+                    <a href="/auth/google" class="btn btn-secondary" style="font-size: 0.85rem;">Login para guardar</a>
+                `;
+            }
+        } catch (e) {
+            console.error('Error checking auth:', e);
+        }
+    } else {
+        claimBanner.classList.add('hidden');
+    }
+}
+
+async function claimQr() {
+    const claimBtn = document.getElementById('claimBtn');
+    const originalText = claimBtn.innerHTML;
+
+    try {
+        claimBtn.disabled = true;
+        claimBtn.innerHTML = '<div class="loading"></div> Guardando...';
+
+        const response = await fetch(`/api/qr/claim/${shortId}`, {
+            method: 'POST'
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al reclamar el QR');
+        }
+
+        showAlert('✅ ¡QR guardado en tu cuenta!');
+        // Reload data to hide banner
+        qrData.userId = 1; // Any non-null value to hide banner
+        displayQrData();
+
+    } catch (error) {
+        console.error('Error:', error);
+        showAlert('❌ ' + error.message, 'error');
+        claimBtn.disabled = false;
+        claimBtn.innerHTML = originalText;
+    }
 }
 
 async function loadAnalytics() {
@@ -178,7 +237,10 @@ function parseBrowser(userAgent) {
 
 function formatDate(dateString) {
     if (!dateString) return '-';
-    const date = new Date(dateString);
+    // SQLite CURRENT_TIMESTAMP returns YYYY-MM-DD HH:MM:SS in UTC.
+    // Convert to ISO format (YYYY-MM-DDTHH:MM:SSZ) so JS treats it as UTC.
+    const isoString = dateString.includes('T') ? dateString : dateString.replace(' ', 'T') + 'Z';
+    const date = new Date(isoString);
     return date.toLocaleDateString('es-ES', {
         year: 'numeric',
         month: 'short',

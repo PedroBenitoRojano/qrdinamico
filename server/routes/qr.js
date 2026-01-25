@@ -430,5 +430,29 @@ router.delete('/manage/:shortId', async (req, res) => {
     }
 });
 
+// Claim anonymous QR code
+router.post('/claim/:shortId', isAuthenticated, (req, res) => {
+    try {
+        const { shortId } = req.params;
+        const qr = qrDb.findByShortId(shortId);
+
+        if (!qr) {
+            return res.status(404).json({ error: 'QR code not found' });
+        }
+
+        if (qr.user_id) {
+            return res.status(400).json({ error: 'This QR code already belongs to a user' });
+        }
+
+        // Assign to current user
+        qrDb.assignToUser(qr.id, req.user.id);
+
+        res.json({ success: true, message: 'QR code claimed successfully' });
+    } catch (error) {
+        console.error('Error claiming QR code:', error);
+        res.status(500).json({ error: 'Failed to claim QR code' });
+    }
+});
+
 module.exports = router;
 

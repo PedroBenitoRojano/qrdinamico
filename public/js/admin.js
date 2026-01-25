@@ -312,7 +312,10 @@ function downloadQrImage(shortId) {
 }
 
 function formatDate(dateString) {
-    const date = new Date(dateString);
+    if (!dateString) return '-';
+    // Convert SQLite UTC format to ISO format
+    const isoString = dateString.includes('T') ? dateString : dateString.replace(' ', 'T') + 'Z';
+    const date = new Date(isoString);
     return date.toLocaleDateString('es-ES', {
         year: 'numeric',
         month: 'short',

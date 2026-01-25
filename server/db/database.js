@@ -168,6 +168,15 @@ const qrDb = {
     return this.findById(id);
   },
 
+  assignToUser(id, userId) {
+    const stmt = db.prepare('UPDATE qrcodes SET user_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?');
+    stmt.bind([userId, id]);
+    stmt.step();
+    stmt.free();
+    saveDatabase();
+    return this.findById(id);
+  },
+
   incrementVisits(id) {
     const stmt = db.prepare('UPDATE qrcodes SET visits_count = visits_count + 1 WHERE id = ?');
     stmt.bind([id]);

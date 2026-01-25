@@ -63,11 +63,6 @@
 
       <form id="quickCreateForm">
         <div class="form-group">
-          <label for="title" class="form-label">Título del QR (opcional)</label>
-          <input type="text" id="title" name="title" class="form-input" placeholder="Mi QR Code">
-        </div>
-
-        <div class="form-group">
           <label for="url" class="form-label">URL de Destino</label>
           <input type="url" id="url" name="url" class="form-input" placeholder="https://ejemplo.com" required>
         </div>
@@ -83,8 +78,9 @@
               style="border-radius: 0 var(--radius-md) var(--radius-md) 0; flex: 1;" pattern="^[a-zA-Z0-9-_]+$"
               title="Solo letras, números, guiones y guiones bajos">
           </div>
-          <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 5px;">Ej:
-            localhost:3000/qr/<strong>mi-enlace-pro</strong></p>
+          <p id="aliasExample" style="font-size: 0.75rem; color: var(--text-muted); margin-top: 5px;">
+            Ej: <span id="exampleHost">domain.com</span>/qr/<strong>mi-enlace-pro</strong>
+          </p>
         </div>
 
         <button type="submit" class="btn btn-primary" style="width: 100%;">

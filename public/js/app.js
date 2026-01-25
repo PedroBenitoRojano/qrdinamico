@@ -14,7 +14,6 @@ if (quickCreateForm) {
         e.preventDefault();
 
         const url = document.getElementById('url').value;
-        const title = document.getElementById('title').value;
         const submitBtn = quickCreateForm.querySelector('button[type="submit"]');
         const originalBtnText = submitBtn.innerHTML;
 
@@ -31,11 +30,12 @@ if (quickCreateForm) {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ url, title: title || null, alias: alias || null })
+                body: JSON.stringify({ url, title: null, alias: alias || null })
             });
 
             if (!response.ok) {
-                throw new Error('Error al crear el QR code');
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Error al crear el QR code');
             }
 
             const data = await response.json();
@@ -157,7 +157,10 @@ if (downloadBtn) {
 }
 
 function formatDate(dateString) {
-    const date = new Date(dateString);
+    if (!dateString) return '-';
+    // Convert SQLite UTC format to ISO format
+    const isoString = dateString.includes('T') ? dateString : dateString.replace(' ', 'T') + 'Z';
+    const date = new Date(isoString);
     return date.toLocaleDateString('es-ES', {
         year: 'numeric',
         month: 'short',
@@ -221,3 +224,9 @@ async function checkLoginStatus() {
 
 // Initialize
 checkLoginStatus();
+
+// Update example host
+const exampleHost = document.getElementById('exampleHost');
+if (exampleHost) {
+    exampleHost.textContent = window.location.host;
+}
