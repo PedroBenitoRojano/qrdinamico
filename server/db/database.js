@@ -17,7 +17,45 @@ async function initDatabase() {
     db = new SQL.Database();
   }
 
-  // Execute schema
+  // Auto-migration for existing databases
+  try {
+    const tableInfo = db.exec("PRAGMA table_info(users);");
+    if (tableInfo.length > 0) {
+      const columns = tableInfo[0].values.map(row => row[1]);
+
+      // If password column is missing, migrate the table
+      if (!columns.includes('password')) {
+        console.log('[DB] Migrating users table...');
+        db.run('BEGIN TRANSACTION;');
+        db.run('ALTER TABLE users RENAME TO users_old;');
+        db.run(`
+          CREATE TABLE users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            google_id TEXT UNIQUE,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT,
+            name TEXT NOT NULL,
+            picture TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+          );
+        `);
+        db.run(`
+          INSERT INTO users (id, google_id, email, name, picture, created_at)
+          SELECT id, google_id, email, COALESCE(name, email), picture, created_at
+          FROM users_old;
+        `);
+        db.run('DROP TABLE users_old;');
+        db.run('COMMIT;');
+        saveDatabase();
+        console.log('[DB] Users table migrated successfully.');
+      }
+    }
+  } catch (err) {
+    console.error('[DB] Migration check failed:', err);
+    if (db) db.run('ROLLBACK;');
+  }
+
+  // Execute schema (creates other tables if they don't exist)
   const schemaPath = path.join(__dirname, 'schema.sql');
   const schema = fs.readFileSync(schemaPath, 'utf8');
   db.run(schema);
