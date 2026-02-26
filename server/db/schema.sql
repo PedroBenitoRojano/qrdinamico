@@ -1,9 +1,10 @@
--- Users table for storing Google OAuth user data
+-- Users table for storing Google and Local user data
 CREATE TABLE IF NOT EXISTS users (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  google_id TEXT UNIQUE NOT NULL,
-  email TEXT NOT NULL,
-  name TEXT,
+  google_id TEXT UNIQUE, -- Nullable for local users
+  email TEXT UNIQUE NOT NULL,
+  password TEXT, -- Hash for local users, null for Google users
+  name TEXT NOT NULL,
   picture TEXT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );

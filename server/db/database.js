@@ -56,9 +56,17 @@ const userDb = {
     stmt.step();
     stmt.free();
     saveDatabase();
-    const result = db.exec('SELECT last_insert_rowid() as id');
-    const lastId = result[0].values[0][0];
-    return this.findById(lastId);
+    // Use findByEmail to get the full user object including current ID
+    return this.findByEmail(email);
+  },
+
+  createLocal(email, passwordHash, name) {
+    const stmt = db.prepare('INSERT INTO users (email, password, name) VALUES (?, ?, ?)');
+    stmt.bind([email, passwordHash, name]);
+    stmt.step();
+    stmt.free();
+    saveDatabase();
+    return this.findByEmail(email);
   },
 
   findById(id) {

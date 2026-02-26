@@ -15,13 +15,34 @@ async function loadUser() {
     try {
         const response = await fetch('/auth/user');
         if (!response.ok) {
-            window.location.href = '/';
+            window.location.href = '/login.html';
             return;
         }
 
         const user = await response.json();
-        document.getElementById('userName').textContent = user.name;
-        document.getElementById('userAvatar').src = user.picture || 'https://via.placeholder.com/40';
+        const userNameEl = document.getElementById('userName');
+        if (userNameEl) userNameEl.textContent = user.name;
+
+        const img = document.getElementById('userAvatar');
+        if (img) {
+            if (user.picture) {
+                img.src = user.picture;
+                img.style.display = 'block';
+            } else {
+                // Replace image with initials div if no picture
+                const initials = user.name ? user.name.charAt(0).toUpperCase() : '?';
+                const placeholder = document.createElement('div');
+                placeholder.className = 'user-avatar';
+                placeholder.style.cssText = `
+                    width: 40px; height: 40px; border-radius: 50%; 
+                    background: var(--primary-gradient); display: flex; 
+                    align-items: center; justify-content: center; 
+                    font-weight: 800; color: white; border: 2px solid var(--primary-color);
+                `;
+                placeholder.textContent = initials;
+                img.replaceWith(placeholder);
+            }
+        }
 
         // Show admin button if user is admin
         if (user.isAdmin) {
@@ -32,11 +53,11 @@ async function loadUser() {
             adminBtn.style.marginRight = '1rem';
 
             const userInfo = document.querySelector('.user-info');
-            userInfo.insertBefore(adminBtn, userInfo.firstChild);
+            if (userInfo) userInfo.insertBefore(adminBtn, userInfo.firstChild);
         }
     } catch (error) {
         console.error('Error loading user:', error);
-        window.location.href = '/';
+        window.location.href = '/login.html';
     }
 }
 

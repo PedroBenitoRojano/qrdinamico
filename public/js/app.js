@@ -208,11 +208,14 @@ async function checkLoginStatus() {
             const user = await response.json();
             authContainer.innerHTML = `
                 <div class="user-info" style="display:flex; align-items:center; gap:10px;">
-                    <img src="${user.picture || 'https://via.placeholder.com/32'}" alt="${user.name}" style="width:32px; height:32px; border-radius:50%; object-fit: cover;">
+                    <div style="width:32px; height:32px; border-radius:50%; background: var(--primary-gradient); display: flex; align-items: center; justify-content: center; font-weight: bold; overflow: hidden;">
+                        ${user.picture ? `<img src="${user.picture}" alt="${user.name}" style="width:100%; height:100%; object-fit: cover;">` : user.name.charAt(0).toUpperCase()}
+                    </div>
                     <span style="font-weight:600; font-size: 0.9rem; color: var(--text-primary);">${user.name}</span>
                     <a href="/dashboard" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.85rem; text-decoration: none;">
                         Dashboard ➜
                     </a>
+                    <a href="/auth/logout" style="color: var(--text-muted); font-size: 0.8rem; text-decoration: none; margin-left: 5px;">Salir</a>
                 </div>
             `;
         }
